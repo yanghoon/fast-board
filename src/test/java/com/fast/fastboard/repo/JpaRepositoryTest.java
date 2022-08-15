@@ -1,5 +1,6 @@
 package com.fast.fastboard.repo;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -53,6 +54,10 @@ public class JpaRepositoryTest {
         // Given
         final long insertBeforeCount = articleRepository.count();
         Article newArticle = Article.of("new article", "new content", "new tags");
+        Assertions.assertThat(newArticle.getCreatedAt()).isNull();
+        Assertions.assertThat(newArticle.getCreatedBy()).isNull();
+        Assertions.assertThat(newArticle.getModifiedAt()).isNull();
+        Assertions.assertThat(newArticle.getModifiedBy()).isNull();
 
         // When
         Article saved = articleRepository.save(newArticle);
@@ -61,6 +66,10 @@ public class JpaRepositoryTest {
         // Then
         Assertions.assertThat(insertAfterCount).isEqualTo(insertBeforeCount + 1);
         Assertions.assertThat(saved).hasFieldOrPropertyWithValue("id", insertAfterCount);
+        Assertions.assertThat(saved.getCreatedAt()).isNotNull();
+        Assertions.assertThat(saved.getCreatedBy()).isNotNull();
+        Assertions.assertThat(saved.getModifiedAt()).isNotNull();
+        Assertions.assertThat(saved.getModifiedBy()).isNotNull();
         // Assertions.assertThat(saved).matches((s) -> s.getId() == insertAfterCount);
         // Assertions.assertThat(saved).returns(insertAfterCount, (s) -> s.getId());
     }
@@ -71,6 +80,8 @@ public class JpaRepositoryTest {
         // Given
         final String modifiedTags = "#boot";
         final Article article = articleRepository.findById(1L).orElseThrow();
+        final OffsetDateTime modifiedAt = article.getModifiedAt();
+        // final String modifiedBy = article.getModifiedBy();
         article.setTags(modifiedTags);
 
         // When
@@ -82,6 +93,8 @@ public class JpaRepositoryTest {
         // Then
         Assertions.assertThat(saved).isEqualTo(article);
         Assertions.assertThat(saved).hasFieldOrPropertyWithValue("tags", modifiedTags);
+        Assertions.assertThat(saved.getModifiedAt()).isAfter(modifiedAt);
+        // Assertions.assertThat(saved.getModifiedBy()).isNotEqualTo(modifiedBy);
     }
 
     @DisplayName("Delete Test")

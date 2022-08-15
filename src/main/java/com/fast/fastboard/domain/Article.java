@@ -1,6 +1,5 @@
 package com.fast.fastboard.domain;
 
-import java.time.OffsetDateTime;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
@@ -17,10 +16,6 @@ import javax.persistence.OneToMany;
 import javax.persistence.OrderBy;
 import javax.persistence.Table;
 
-import org.springframework.data.annotation.CreatedBy;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import lombok.Getter;
@@ -35,9 +30,8 @@ import lombok.ToString;
     @Index(columnList = "createdAt", name = "idx_createdAt"),
     @Index(columnList = "createdBy", name = "idx_createdBy")
 })
-@EntityListeners(AuditingEntityListener.class)
 @Entity
-public class Article {
+public class Article extends AuditFields {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -56,19 +50,6 @@ public class Article {
     @OrderBy("id")
     @OneToMany(mappedBy = "article", cascade = CascadeType.ALL)
     private final Set<Comment> comments = new LinkedHashSet<>();
-
-    @CreatedDate
-    @Column(nullable = false)
-    private OffsetDateTime createdAt;
-    @CreatedBy
-    @Column(nullable = false, length = 100)
-    private String createdBy;
-    @LastModifiedDate
-    @Column(nullable = false)
-    private OffsetDateTime modifiedAt;
-    @LastModifiedBy
-    @Column(nullable = false, length = 100)
-    private String modifiedBy;
 
     protected Article() {}
 
